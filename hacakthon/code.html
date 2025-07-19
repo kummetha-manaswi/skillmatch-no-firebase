@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SkillMatch - Student & Startup Connector</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #a8f0c6, #d4f9e9);
+      color: #333;
+    }
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .step {
+      display: none;
+    }
+    .step.active {
+      display: block;
+    }
+    .buttons {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    .btn {
+      background: #28a745;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      cursor: pointer;
+      border-radius: 6px;
+      font-weight: bold;
+    }
+    .btn:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0 0;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    .progress-bar {
+      height: 10px;
+      background: #ccc;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      overflow: hidden;
+    }
+    .progress {
+      height: 10px;
+      background: #28a745;
+      width: 0%;
+      transition: width 0.3s;
+    }
+    .radio-group {
+      display: flex;
+      gap: 20px;
+      margin-top: 10px;
+    }
+    .checkbox-group label {
+      display: block;
+      margin: 6px 0;
+    }
+    .summary {
+      background: #f2fff6;
+      padding: 20px;
+      margin-top: 20px;
+      border-radius: 10px;
+      font-size: 15px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>SkillMatch 🌱</h2>
+    <div class="progress-bar"><div class="progress" id="progress"></div></div>
+    <form id="multiStepForm">
+      <div class="step active" data-step="1">
+        <label>Are you a Student or a Startup?</label>
+        <div class="radio-group">
+          <label><input type="radio" name="role" value="Student" required> 👩‍🎓 Student</label>
+          <label><input type="radio" name="role" value="Startup"> 🚀 Startup</label>
+        </div>
+      </div>
+
+      <div class="step" data-step="2">
+        <label>Enter Your Name</label>
+        <input type="text" name="name" required placeholder="John D. Doe">
+      </div>
+
+      <div class="step" data-step="3">
+        <label>Enter Your Email</label>
+        <input type="email" name="email" required placeholder="example@gmail.com">
+      </div>
+
+      <div class="step" data-step="4">
+        <label>Select Your Skills</label>
+        <div class="checkbox-group">
+          <label><input type="checkbox" name="skills" value="Python"> Python</label>
+          <label><input type="checkbox" name="skills" value="JavaScript"> JavaScript</label>
+          <label><input type="checkbox" name="skills" value="HTML"> HTML</label>
+          <label><input type="checkbox" name="skills" value="CSS"> CSS</label>
+          <label><input type="checkbox" name="skills" value="C++"> C++</label>
+          <label><input type="checkbox" name="skills" value="React"> React</label>
+          <label><input type="checkbox" name="skills" value="Node.js"> Node.js</label>
+          <label><input type="checkbox" name="skills" value="Java"> Java</label>
+          <label><input type="checkbox" name="skills" value="MySQL"> MySQL</label>
+          <label><input type="checkbox" name="skills" value="MongoDB"> MongoDB</label>
+          <label><input type="checkbox" name="skills" value="UI/UX"> UI/UX</label>
+          <label><input type="checkbox" name="skills" value="Android"> Android</label>
+          <label><input type="checkbox" name="skills" value="Flutter"> Flutter</label>
+          <label><input type="checkbox" name="skills" value="Git"> Git</label>
+          <label><input type="checkbox" name="skills" value="Data Science"> Data Science</label>
+          <label><input type="checkbox" name="skills" value="Machine Learning"> Machine Learning</label>
+          <label><input type="checkbox" name="skills" value="AI"> AI</label>
+          <label><input type="checkbox" name="skills" value="Cybersecurity"> Cybersecurity</label>
+          <label><input type="checkbox" name="skills" value="Cloud Computing"> Cloud Computing</label>
+          <label><input type="checkbox" name="skills" value="Other" id="otherSkillCheck"> Other</label>
+        </div>
+        <input type="text" name="otherSkill" id="otherSkillInput" style="display:none;" placeholder="Mention your other skill">
+      </div>
+
+      <div class="step" data-step="5">
+        <label>What are your Interests? (Optional)</label>
+        <textarea name="interests" rows="3" placeholder="e.g., Building apps, Working on open-source..."></textarea>
+      </div>
+
+      <div class="step" data-step="6">
+        <label>How many hours are you available per week?</label>
+        <input type="number" name="availability" required min="1" placeholder="e.g., 10">
+      </div>
+
+      <div class="step" data-step="7" id="resultStep">
+        <div class="summary" id="resultSummary">
+          <strong>Thanks for your submission!</strong>
+          <p>Click the button below to know more about your skill profile & suggestions 👇</p>
+          <button type="button" class="btn" onclick="showSuggestions()">Click here to know about you</button>
+          <div id="suggestions" style="margin-top: 20px;"></div>
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button type="button" class="btn" id="prevBtn" onclick="nextPrev(-1)" disabled>Back</button>
+        <button type="button" class="btn" id="nextBtn" onclick="nextPrev(1)">Next</button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const steps = document.querySelectorAll(".step");
+    let currentStep = 0;
+
+    const nextBtn = document.getElementById("nextBtn");
+    const prevBtn = document.getElementById("prevBtn");
+    const progress = document.getElementById("progress");
+    const form = document.getElementById("multiStepForm");
+    const otherSkillCheck = document.getElementById("otherSkillCheck");
+    const otherSkillInput = document.getElementById("otherSkillInput");
+
+    function showStep(n) {
+      steps.forEach((step, i) => step.classList.toggle("active", i === n));
+      prevBtn.disabled = n === 0;
+      progress.style.width = ((n) / (steps.length - 1)) * 100 + "%";
+      nextBtn.innerText = n === steps.length - 1 ? "Submit" : "Next";
+    }
+
+    function validateStep() {
+      const current = steps[currentStep];
+      const inputs = current.querySelectorAll("input, textarea");
+      for (const input of inputs) {
+        const val = input.value.trim();
+        if (input.name === "name" && !/^[A-Za-z.\s]{4,}$/.test(val)) {
+          alert("Name should be at least 4 characters, only alphabets, dot, and space.");
+          return false;
+        }
+        if (input.name === "email" && !/@(gmail\.com|email\.com)$/.test(val)) {
+          alert("Email should end with @gmail.com or @email.com");
+          return false;
+        }
+        if (input.name === "availability" && (!/^\d+$/.test(val) || parseInt(val) <= 0)) {
+          alert("Availability should be a valid number");
+          return false;
+        }
+        if (input.required && val === "") {
+          alert("This field is required");
+          return false;
+        }
+      }
+      if (currentStep === 3 && otherSkillCheck.checked && otherSkillInput.value.trim() === "") {
+        alert("Please mention your other skill");
+        return false;
+      }
+      return true;
+    }
+
+    function nextPrev(n) {
+      if (n === 1 && !validateStep()) return;
+      currentStep += n;
+      if (currentStep >= steps.length) {
+        form.submit();
+        return;
+      }
+      showStep(currentStep);
+    }
+
+    form.addEventListener("keypress", function(e) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        nextPrev(1);
+      }
+    });
+
+    otherSkillCheck.addEventListener("change", () => {
+      otherSkillInput.style.display = otherSkillCheck.checked ? "block" : "none";
+    });
+
+    function showSuggestions() {
+      const selectedSkills = [...form.querySelectorAll("input[name='skills']:checked")].map(i => i.value);
+      let msg = "";
+      if (selectedSkills.includes("Python") || selectedSkills.includes("AI") || selectedSkills.includes("Data Science")) {
+        msg += `<p>You're strong in backend/data roles. You can explore roles like Data Analyst, ML Engineer, or Python Developer.</p>`;
+      } else if (selectedSkills.includes("HTML") || selectedSkills.includes("CSS") || selectedSkills.includes("JavaScript")) {
+        msg += `<p>You're well-suited for Frontend Development. Look for Web Developer or UI/UX gigs.</p>`;
+      } else {
+        msg += `<p>Based on your skills, explore general internships or open-source opportunities to grow.</p>`;
+      }
+      msg += `<p>✨ Hope this helped! For queries, feel free to reach us at <a href="#">Contact Us</a>.</p>`;
+      document.getElementById("suggestions").innerHTML = msg;
+    }
+
+    showStep(currentStep);
+  </script>
+</body>
+</html> 
